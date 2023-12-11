@@ -48,7 +48,7 @@
         }
 
         button:hover {
-            background-color: #66187e;
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -115,10 +115,11 @@ event.preventDefault();
                         card: cedula 
                     }
                 );
+                document.getElementById("crud-form").reset();
 
             };
+            document.getElementById("crud-form").addEventListener("submit", crearRegistro);
             
-            document.getElementById("crud-form").reset();
 
 </script>
 </body>
