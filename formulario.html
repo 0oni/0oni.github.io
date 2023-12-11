@@ -57,8 +57,8 @@
     <form action="#" method="post">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
-        <label for="nombre">Apellido:</label>
-        <input type="text" id="nombre" name="nombre" required>
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required>
 
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
@@ -66,21 +66,61 @@
         <label for="edad">Edad:</label>
         <input type="number" id="edad" name="edad" required>
 
-        <label for="pais">País:</label>
-        <select id="pais" name="pais" required>
-            <option value="">Selecciona...</option>
-            <option value="es">España</option>
-            <option value="mx">México</option>
-            <option value="ar">Argentina</option>
-            <!-- Agrega más opciones según sea necesario -->
-
-        </select>
+        <label for="cedula">:</label>
+        <input type="number" id="cedula" name="cedula" required>
 
         <label for="mensaje">Mensaje:</label>
         <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
 
         <button type="submit">Enviar</button>
     </form>
+    <script type="module">
 
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBgxzHt5RFPqYsPgl1dS5Q0J0ZNdVBIjs4",
+  authDomain: "formulario01-1f262.firebaseapp.com",
+  databaseURL: "https://formulario01-1f262-default-rtdb.firebaseio.com",
+  projectId: "formulario01-1f262",
+  storageBucket: "formulario01-1f262.appspot.com",
+  messagingSenderId: "931616677892",
+  appId: "1:931616677892:web:1a4a74dcd2239f689a1551",
+  measurementId: "G-KDW6SPGE9G"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = Database(app);
+window.crearRegistro = function () {
+                const nombre = document.getElementById("nombre").value;
+                const apellido = document.getElementById("apellido").value;
+                const email = document.getElementById("email").value;
+                const edad = document.getElementById("edad").value;
+                const cedula = document.getElementById("cedula").value;
+                const mensaje = document.getElementById("mensaje").value;
+                console.log(nombre, edad);
+                
+                push(
+                    ref(database, 'septimo'),
+                    {
+                        name: nombre,
+                        last_name: apellido,
+                        email: email,
+                        age: edad,
+                        card: cedula,
+                        message: mensaje 
+                    }
+                );
+
+            }
+
+</script>
 </body>
 </html>
