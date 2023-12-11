@@ -72,13 +72,11 @@
         <button type="submit">Enviar</button>
     </form>
 
-    <div id="lista-elementos"></div>
-
     <script type="module">
 
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -94,9 +92,6 @@ const firebaseConfig = {
   appId: "1:931616677892:web:1a4a74dcd2239f689a1551",
   measurementId: "G-KDW6SPGE9G"
 };
-
-</script>
-<script>
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -121,60 +116,10 @@ event.preventDefault();
                     }
                 );
                 document.getElementById("crud-form").reset();
-                actualizarLista();
 
             };
             document.getElementById("crud-form").addEventListener("submit", crearRegistro);
             
-            function actualizarLista() {
-            const listaElementos = document.getElementById("lista-elementos");
-
-            // Limpiar la lista antes de actualizar
-            listaElementos.innerHTML = "";
-
-            // Obtener los elementos desde Firebase y mostrarlos en la lista
-            // (Implementación según la estructura de tus datos en la base de datos)
-            // Puedes usar 'onValue' para mantener la lista actualizada en tiempo real
-
-            // Ejemplo básico de cómo puedes mostrar los elementos:
-            const elementosRef = ref(database, 'formulario01');
-            onValue(elementosRef, (snapshot) => {
-                const elementos = snapshot.val();
-                for (const key in elementos) {
-                    if (Object.hasOwnProperty.call(elementos, key)) {
-                        const elemento = elementos[key];
-                        const listItem = document.createElement("div");
-                        listItem.innerHTML = `
-                            <strong>${elemento.name} ${elemento.last_name}</strong> (${elemento.age} años)<br>
-                            Email: ${elemento.email}<br>
-                            Cédula: ${elemento.card}<br>
-                            <button onclick="editarElemento('${key}')">Editar</button>
-                            <button onclick="eliminarElemento('${key}')">Eliminar</button>
-                            <hr>
-                        `;
-                        listaElementos.appendChild(listItem);
-                    }
-                }
-            });
-        }
-
-        // Función para editar un elemento (a implementar según tus necesidades)
-        window.editarElemento = function (key) {
-            // Implementa la lógica de edición según tus necesidades
-            console.log("Editar elemento con clave:", key);
-        };
-
-        // Función para eliminar un elemento
-        window.eliminarElemento = function (key) {
-            // Implementa la lógica de eliminación según tus necesidades
-            remove(ref(database, `formulario01/${key}`));
-            console.log("Eliminar elemento con clave:", key);
-            actualizarLista(); // Actualizar la lista después de eliminar
-        };
-
-        // Inicializar la lista al cargar la página
-        actualizarLista();
-    </script>
 
 </script>
 </body>
