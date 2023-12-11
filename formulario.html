@@ -17,7 +17,7 @@
         }
 
         form {
-            background-color: #fff;
+            background-color: #238383;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -95,7 +95,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = Database(app);
+const database = getDatabase(app);
 window.crearRegistro = function () {
 event.preventDefault();
                 const nombre = document.getElementById("nombre").value;
