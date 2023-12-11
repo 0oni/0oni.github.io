@@ -64,6 +64,22 @@
 
         #registros-list li {
             margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .eliminar-btn {
+            background-color: #e74c3c;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .eliminar-btn:hover {
+            background-color: #c0392b;
         }
     </style>
 </head>
@@ -141,11 +157,28 @@ event.preventDefault();
                 } else {
                 alert("Por favor, complete todos los campos.");
             }
-
-
             };
 
-            function mostrarRegistros() {
+
+            function agregarBotonEliminar(key) {
+            const btnEliminar = document.createElement("button");
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.className = "eliminar-btn";
+            btnEliminar.addEventListener("click", () => eliminarRegistro(key));
+
+            return btnEliminar;
+        }
+
+        function eliminarRegistro(key) {
+            const registroRef = ref(database, `formulario01/${key}`);
+            remove(registroRef).then(() => {
+                console.log("Registro eliminado correctamente.");
+            }).catch((error) => {
+                console.error("Error al eliminar registro:", error);
+            });
+        }
+
+        function mostrarRegistros() {
             const registrosList = document.getElementById("registros-list");
             registrosList.innerHTML = '';
 
@@ -153,9 +186,10 @@ event.preventDefault();
             onValue(registrosRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    Object.values(data).forEach((registro) => {
+                    Object.entries(data).forEach(([key, registro]) => {
                         const listItem = document.createElement("li");
-                        listItem.textContent = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
+                        listItem.innerHTML = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
+                        listItem.appendChild(agregarBotonEliminar(key));
                         registrosList.appendChild(listItem);
                     });
                 }
@@ -167,8 +201,6 @@ event.preventDefault();
         document.getElementById("crud-form").addEventListener("submit", crearRegistro);
 
         window.onload = mostrarRegistros;
-            
-
 </script>
 </body>
 </html>
