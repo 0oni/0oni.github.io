@@ -5,122 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de ejemplo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #a32222;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        form {
-            background-color: #238383;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #4caf50;
-            color: #fff;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
+        /* Estilos ... */
     </style>
 </head>
 <body>
 
     <form id="crud-form">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required>
-        <label for="apellido">Apellido:</label>
-        <input type="text" id="apellido" name="apellido" required>
-
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="edad">Edad:</label>
-        <input type="number" id="edad" name="edad" required>
-
-        <label for="cedula">Cedula</label>
-        <input type="number" id="cedula" name="cedula" required>
-
+        <!-- Tu formulario actual -->
         <button type="submit">Enviar</button>
     </form>
 
+    <!-- Área para mostrar la lista de elementos -->
+    <div id="lista-elementos"></div>
+
     <script type="module">
+        // Importar las funciones necesarias de Firebase
 
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        // Tu configuración de Firebase
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBgxzHt5RFPqYsPgl1dS5Q0J0ZNdVBIjs4",
-  authDomain: "formulario01-1f262.firebaseapp.com",
-  databaseURL: "https://formulario01-1f262-default-rtdb.firebaseio.com",
-  projectId: "formulario01-1f262",
-  storageBucket: "formulario01-1f262.appspot.com",
-  messagingSenderId: "931616677892",
-  appId: "1:931616677892:web:1a4a74dcd2239f689a1551",
-  measurementId: "G-KDW6SPGE9G"
-};
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-window.crearRegistro = function () {
-event.preventDefault();
-                const nombre = document.getElementById("nombre").value;
-                const apellido = document.getElementById("apellido").value;
-                const email = document.getElementById("email").value;
-                const edad = document.getElementById("edad").value;
-                const cedula = document.getElementById("cedula").value;
-                console.log(nombre, apellido, email, edad, cedula );
-                
-                push(
-                    ref(database, 'formulario01'),
-                    {
-                        name: nombre,
-                        last_name: apellido,
-                        email: email,
-                        age: edad,
-                        card: cedula 
+        // Función para crear un nuevo registro
+        window.crearRegistro = function () {
+            event.preventDefault();
+            const nombre = document.getElementById("nombre").value;
+            const apellido = document.getElementById("apellido").value;
+            const email = document.getElementById("email").value;
+            const edad = document.getElementById("edad").value;
+            const cedula = document.getElementById("cedula").value;
+
+            push(
+                ref(database, 'formulario01'),
+                {
+                    name: nombre,
+                    last_name: apellido,
+                    email: email,
+                    age: edad,
+                    card: cedula 
+                }
+            );
+            document.getElementById("crud-form").reset();
+            actualizarLista(); // Llamada para actualizar la lista
+        };
+
+        // Agregar evento de submit al formulario
+        document.getElementById("crud-form").addEventListener("submit", crearRegistro);
+
+        // Función para actualizar la lista de elementos
+        function actualizarLista() {
+            const listaElementos = document.getElementById("lista-elementos");
+
+            // Limpiar la lista antes de actualizar
+            listaElementos.innerHTML = "";
+
+            // Obtener los elementos desde Firebase y mostrarlos en la lista
+            // (Implementación según la estructura de tus datos en la base de datos)
+            // Puedes usar 'onValue' para mantener la lista actualizada en tiempo real
+
+            // Ejemplo básico de cómo puedes mostrar los elementos:
+            const elementosRef = ref(database, 'formulario01');
+            onValue(elementosRef, (snapshot) => {
+                const elementos = snapshot.val();
+                for (const key in elementos) {
+                    if (Object.hasOwnProperty.call(elementos, key)) {
+                        const elemento = elementos[key];
+                        const listItem = document.createElement("div");
+                        listItem.innerHTML = `
+                            <strong>${elemento.name} ${elemento.last_name}</strong> (${elemento.age} años)<br>
+                            Email: ${elemento.email}<br>
+                            Cédula: ${elemento.card}<br>
+                            <button onclick="editarElemento('${key}')">Editar</button>
+                            <button onclick="eliminarElemento('${key}')">Eliminar</button>
+                            <hr>
+                        `;
+                        listaElementos.appendChild(listItem);
                     }
-                );
-                document.getElementById("crud-form").reset();
+                }
+            });
+        }
 
-            };
-            document.getElementById("crud-form").addEventListener("submit", crearRegistro);
-            
+        // Función para editar un elemento (a implementar según tus necesidades)
+        window.editarElemento = function (key) {
+            // Implementa la lógica de edición según tus necesidades
+            console.log("Editar elemento con clave:", key);
+        };
 
-</script>
+        // Función para eliminar un elemento
+        window.eliminarElemento = function (key) {
+            // Implementa la lógica de eliminación según tus necesidades
+            remove(ref(database, `formulario01/${key}`));
+            console.log("Eliminar elemento con clave:", key);
+            actualizarLista(); // Actualizar la lista después de eliminar
+        };
+
+        // Inicializar la lista al cargar la página
+        actualizarLista();
+    </script>
 </body>
 </html>
