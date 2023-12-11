@@ -57,6 +57,7 @@
     <form id="crud-form">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
+
         <label for="apellido">Apellido:</label>
         <input type="text" id="apellido" name="apellido" required>
 
@@ -81,7 +82,7 @@
 
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -108,8 +109,9 @@ event.preventDefault();
                 const email = document.getElementById("email").value;
                 const edad = document.getElementById("edad").value;
                 const cedula = document.getElementById("cedula").value;
-                console.log(nombre, apellido, email, edad, cedula );
                 
+
+                if (nombre && apellido && email && edad && cedula) {
                 push(
                     ref(database, 'formulario01'),
                     {
@@ -119,33 +121,37 @@ event.preventDefault();
                         age: edad,
                         card: cedula 
                     }
-                );
-                document.getElementById("crud-form").reset();
-                mostrarRegistros();
+                    ).catch(error => console.error("Error al crear registro:", error));
+                    document.getElementById("crud-form").reset();
+                } else {
+                alert("Por favor, complete todos los campos.");
+            }
+
 
             };
 
-            // Función para mostrar registros
-        function mostrarRegistros() {
+            function mostrarRegistros() {
             const registrosList = document.getElementById("registros-list");
-            registrosList.innerHTML = ''; // Limpiar la lista antes de agregar registros nuevos
+            registrosList.innerHTML = '';
 
             const registrosRef = ref(database, 'formulario01');
-            get(registrosRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
+            onValue(registrosRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
                     Object.values(data).forEach((registro) => {
                         const listItem = document.createElement("li");
                         listItem.textContent = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
                         registrosList.appendChild(listItem);
                     });
                 }
+            }, (error) => {
+                console.error("Error al obtener registros:", error);
             });
         }
-         // Agregar evento al formulario
-            document.getElementById("crud-form").addEventListener("submit", crearRegistro);
-             // Mostrar registros al cargar la página
-            window.onload = mostrarRegistros;
+
+        document.getElementById("crud-form").addEventListener("submit", crearRegistro);
+
+        window.onload = mostrarRegistros;
             
 
 </script>
