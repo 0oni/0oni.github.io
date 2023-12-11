@@ -72,6 +72,11 @@
         <button type="submit">Enviar</button>
     </form>
 
+    <div id="registros-container">
+        <h2>Registros</h2>
+        <ul id="registros-list"></ul>
+    </div>
+
     <script type="module">
 
     // Import the functions you need from the SDKs you need
@@ -116,9 +121,31 @@ event.preventDefault();
                     }
                 );
                 document.getElementById("crud-form").reset();
+                mostrarRegistros();
 
             };
+
+            // Función para mostrar registros
+        function mostrarRegistros() {
+            const registrosList = document.getElementById("registros-list");
+            registrosList.innerHTML = ''; // Limpiar la lista antes de agregar registros nuevos
+
+            const registrosRef = ref(database, 'formulario01');
+            get(registrosRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.values(data).forEach((registro) => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
+                        registrosList.appendChild(listItem);
+                    });
+                }
+            });
+        }
+         // Agregar evento al formulario
             document.getElementById("crud-form").addEventListener("submit", crearRegistro);
+             // Mostrar registros al cargar la página
+            window.onload = mostrarRegistros;
             
 
 </script>
