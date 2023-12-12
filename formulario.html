@@ -206,9 +206,21 @@
 
         // Función para mostrar la tabla de edición
         function mostrarTablaEdicion(key) {
+            // Oculta todas las tablas de edición antes de mostrar una nueva
+            document.querySelectorAll(".tabla-edicion").forEach(tabla => {
+                tabla.style.display = "none";
+            });
+
             const tablaEdicion = document.getElementById(`tabla-edicion-${key}`);
             if (tablaEdicion) {
                 tablaEdicion.style.display = "table";
+
+                // Agrega el manejador de eventos para los botones "Guardar" y "Cancelar"
+                const btnGuardar = tablaEdicion.querySelector(".btn-guardar");
+                const btnCancelar = tablaEdicion.querySelector(".btn-cancelar");
+
+                btnGuardar.addEventListener("click", () => actualizarRegistro(key));
+                btnCancelar.addEventListener("click", () => ocultarTablaEdicion(key));
             }
         }
 
@@ -276,8 +288,8 @@
                                 <td><input type="email" id="edit-email-${key}" value="${registro.email}" placeholder="Email"></td>
                                 <td><input type="number" id="edit-edad-${key}" value="${registro.age}" placeholder="Edad"></td>
                                 <td><input type="number" id="edit-cedula-${key}" value="${registro.card}" placeholder="Cédula"></td>
-                                <td><button onclick="actualizarRegistro('${key}')">Guardar</button></td>
-                                <td><button onclick="ocultarTablaEdicion('${key}')">Cancelar</button></td>
+                                <td><button class="btn-guardar">Guardar</button></td>
+                                <td><button class="btn-cancelar">Cancelar</button></td>
                             </tr>
                         `;
 
