@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de ejemplo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #a32222;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        form {
+            background-color: #238383;
+            padding: 20px;
+            margin-right: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #registros-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #registros-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #registros-list li {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .eliminar-btn, .editar-btn {
+            background-color: #e74c3c;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .eliminar-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .editar-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .tabla-edicion {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .tabla-edicion input {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="crud-form">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="edad">Edad:</label>
+        <input type="number" id="edad" name="edad" required>
+
+        <label for="cedula">Cedula</label>
+        <input type="number" id="cedula" name="cedula" required>
+
+        <button type="submit">Enviar</button>
+    </form>
+
+    <div id="registros-container">
+        <h2>Registros</h2>
+        <ul id="registros-list"></ul>
+    </div>
+
+    <script type="module">
+
+        // Importa las funciones necesarias de los SDK que necesitas
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMJsVpnbOwVOiVNbTZScZdet9qlGigDL0",
+            authDomain: "conexion-8ec0d.firebaseapp.com",
+            databaseURL: "https://conexion-8ec0d-default-rtdb.firebaseio.com",
+            projectId: "conexion-8ec0d",
+            storageBucket: "conexion-8ec0d.appspot.com",
+            messagingSenderId: "679910299749",
+            appId: "1:679910299749:web:9800b464879628b4850e8c"
+        };
+
+        // Inicializa Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Función para crear registros
+        window.crearRegistro = function () {
+            event.preventDefault();
+            const nombre = document.getElementById("nombre").value;
+            const apellido = document.getElementById("apellido").value;
+            const email = document.getElementById("email").value;
+            const edad = document.getElementById("edad").value;
+            const cedula = document.getElementById("cedula").value;
+
+            if (nombre && apellido && email && edad && cedula) {
+                push(
+                    ref(database, 'formulario01'),
+                    {
+                        name: nombre,
+                        last_name: apellido,
+                        email: email,
+                        age: edad,
+                        card: cedula
+                    }
+                ).catch(error => console.error("Error al crear registro:", error));
+                document.getElementById("crud-form").reset();
+                mostrarRegistros(); // Añadido: Actualiza la lista después de crear
+            } else {
+                alert("Por favor, complete todos los campos.");
+            }
+        };
+
+        // Función para agregar botones de eliminar y editar
+        function agregarBotones(key) {
+            const btnEliminar = document.createElement("button");
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.className = "eliminar-btn";
+            btnEliminar.addEventListener("click", () => eliminarRegistro(key));
+
+            const btnEditar = document.createElement("button");
+            btnEditar.textContent = "Editar";
+            btnEditar.className = "editar-btn";
+            btnEditar.addEventListener("click", () => mostrarTablaEdicion(key));
+
+            return [btnEliminar, btnEditar];
+        }
+
+        // Función para eliminar un registro
+        function eliminarRegistro(key) {
+            console.log("Clave del registro a eliminar:", key);
+            if (!key) {
+                console.error("La clave es nula o indefinida.");
+                return;
+            }
+
+            const registroRef = ref(database, `formulario01/${key}`);
+            remove(registroRef).then(() => {
+                console.log("Registro eliminado correctamente.");
+                mostrarRegistros(); // Añadido: Actualiza la lista después de eliminar
+            }).catch((error) => {
+                console.error("Error al eliminar registro:", error);
+            });
+        }
+
+        // Función para mostrar la tabla de edición
+        function mostrarTablaEdicion(key) {
+            // Oculta todas las tablas de edición antes de mostrar una nueva
+            document.querySelectorAll(".tabla-edicion").forEach(tabla => {
+                tabla.style.display = "none";
+            });
+
+            const tablaEdicion = document.getElementById(`tabla-edicion-${key}`);
+            if (tablaEdicion) {
+                tablaEdicion.style.display = "table";
+
+                // Agrega el manejador de eventos para los botones "Guardar" y "Cancelar"
+                const btnGuardar = tablaEdicion.querySelector(".btn-guardar");
+                const btnCancelar = tablaEdicion.querySelector(".btn-cancelar");
+
+                btnGuardar.addEventListener("click", () => actualizarRegistro(key));
+                btnCancelar.addEventListener("click", () => ocultarTablaEdicion(key));
+            }
+        }
+
+        // Función para ocultar la tabla de edición
+        function ocultarTablaEdicion(key) {
+            const tablaEdicion = document.getElementById(`tabla-edicion-${key}`);
+            if (tablaEdicion) {
+                tablaEdicion.style.display = "none";
+            }
+        }
+
+        // Función para actualizar un registro
+        function actualizarRegistro(key) {
+            const nombre = document.getElementById(`edit-nombre-${key}`).value;
+            const apellido = document.getElementById(`edit-apellido-${key}`).value;
+            const email = document.getElementById(`edit-email-${key}`).value;
+            const edad = document.getElementById(`edit-edad-${key}`).value;
+            const cedula = document.getElementById(`edit-cedula-${key}`).value;
+
+            if (nombre && apellido && email && edad && cedula) {
+                const registroRef = ref(database, `formulario01/${key}`);
+                update(registroRef, {
+                    name: nombre,
+                    last_name: apellido,
+                    email: email,
+                    age: edad,
+                    card: cedula
+                }).then(() => {
+                    console.log("Registro actualizado correctamente.");
+                    mostrarRegistros(); // Añadido: Actualiza la lista después de editar
+                }).catch((error) => {
+                    console.error("Error al actualizar registro:", error);
+                });
+
+                ocultarTablaEdicion(key);
+            } else {
+                alert("Por favor, complete todos los campos de edición.");
+            }
+        }
+
+        // Función para mostrar registros
+        function mostrarRegistros() {
+            const registrosList = document.getElementById("registros-list");
+            registrosList.innerHTML = '';
+
+            const registrosRef = ref(database, 'formulario01');
+            onValue(registrosRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    Object.entries(data).forEach(([key, registro]) => {
+                        const listItem = document.createElement("li");
+                        listItem.innerHTML = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
+                        const [btnEliminar, btnEditar] = agregarBotones(key);
+                        listItem.appendChild(btnEliminar);
+                        listItem.appendChild(btnEditar);
+
+                        // Agrega la tabla de edición debajo del registro
+                        const tablaEdicion = document.createElement("table");
+                        tablaEdicion.className = "tabla-edicion";
+                        tablaEdicion.id = `tabla-edicion-${key}`;
+                        tablaEdicion.innerHTML = `
+                        <table class="table" border="1px">
+                            <tr>
+                                <td><input type="text" id="edit-nombre-${key}" value="${registro.name}" placeholder="Nombre"></td>
+                                <td><input type="text" id="edit-apellido-${key}" value="${registro.last_name}" placeholder="Apellido"></td>
+                                <td><input type="email" id="edit-email-${key}" value="${registro.email}" placeholder="Email"></td>
+                                <td><input type="number" id="edit-edad-${key}" value="${registro.age}" placeholder="Edad"></td>
+                                <td><input type="number" id="edit-cedula-${key}" value="${registro.card}" placeholder="Cédula"></td>
+                                <td><button class="btn-guardar">Guardar</button></td>
+                                <td><button class="btn-cancelar">Cancelar</button></td>
+                            </tr>
+                            </table>
+                        `;
+
+                        listItem.appendChild(tablaEdicion);
+
+                        registrosList.appendChild(listItem);
+                    });
+                }
+            }, (error) => {
+                console.error("Error al obtener registros:", error);
+            });
+        }
+
+        // Agrega el evento submit al formulario
+        document.getElementById("crud-form").addEventListener("submit", crearRegistro);
+
+        // Al cargar la página, muestra los registros
+        window.onload = mostrarRegistros;
+
+    </script>
+</body>
+</html>
