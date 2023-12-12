@@ -170,13 +170,16 @@ event.preventDefault();
         }
 
         function eliminarRegistro(key) {
-            const registroRef = ref(database, `formulario01/${key}`);
-            remove(registroRef).then(() => {
-                console.log("Registro eliminado correctamente.");
-            }).catch((error) => {
-                console.error("Error al eliminar registro:", error);
-            });
-        }
+    console.log("Intentando eliminar registro con clave:", key);
+    const registroRef = ref(database, `formulario01/${key}`);
+    remove(registroRef)
+        .then(() => {
+            console.log("Registro eliminado correctamente.");
+        })
+        .catch((error) => {
+            console.error("Error al eliminar registro:", error);
+        });
+}
 
         function mostrarRegistros() {
             const registrosList = document.getElementById("registros-list");
