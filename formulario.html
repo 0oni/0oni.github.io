@@ -98,7 +98,15 @@
         }
 
         .tabla-edicion input {
+            width: calc(100% - 16px);
+            padding: 8px;
+            box-sizing: border-box;
             margin-bottom: 8px;
+        }
+
+        .tabla-edicion button {
+            width: 49%;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -302,17 +310,12 @@
                                 <td><input type="email" id="edit-email-${key}" value="${registro.email}" placeholder="Email"></td>
                                 <td><input type="number" id="edit-edad-${key}" value="${registro.age}" placeholder="Edad"></td>
                                 <td><input type="number" id="edit-cedula-${key}" value="${registro.card}" placeholder="Cédula"></td>
-                                <td><button class="btn-guardar">Guardar</button></td>
-                                <td><button class="btn-cancelar">Cancelar</button></td>
+                                <td>
+                                    <button class="btn-guardar" onclick="actualizarRegistro('${key}')">Guardar</button>
+                                    <button class="btn-cancelar" onclick="ocultarTablaEdicion('${key}')">Cancelar</button>
+                                </td>
                             </tr>
                         `;
-
-                        // Añade eventos a los botones de la tabla de edición
-                        const btnGuardar = tablaEdicion.querySelector(".btn-guardar");
-                        const btnCancelar = tablaEdicion.querySelector(".btn-cancelar");
-
-                        btnGuardar.addEventListener("click", () => actualizarRegistro(key));
-                        btnCancelar.addEventListener("click", () => ocultarTablaEdicion(key));
 
                         table.innerHTML += `
                             <tr>
