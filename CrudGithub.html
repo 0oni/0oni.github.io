@@ -138,7 +138,8 @@
             projectId: "conexion-8ec0d",
             storageBucket: "conexion-8ec0d.appspot.com",
             messagingSenderId: "679910299749",
-            appId: "1:679910299749:web:9800b464879628b4850e8c"
+            appId: "1:679910299749:web:9800b464879628b4850e8c",
+            measurementId: "COMPONENTE"
         };
 
         // Inicializa Firebase
@@ -195,7 +196,7 @@
                 return;
             }
 
-            const registroRef = ref(database, `formulario01/${key}`);
+            const registroRef = ref(database, `Steven_Arequipa/${key}`);
             remove(registroRef).then(() => {
                 console.log("Registro eliminado correctamente.");
                 mostrarRegistros(); // Añadido: Actualiza la lista después de eliminar
@@ -241,7 +242,7 @@
             const cedula = document.getElementById(`edit-cedula-${key}`).value;
 
             if (nombre && apellido && email && edad && cedula) {
-                const registroRef = ref(database, `formulario01/${key}`);
+                const registroRef = ref(database, `Steven_Arequipa/${key}`);
                 update(registroRef, {
                     name: nombre,
                     last_name: apellido,
@@ -266,7 +267,7 @@
             const registrosList = document.getElementById("registros-list");
             registrosList.innerHTML = '';
 
-            const registrosRef = ref(database, 'formulario01');
+            const registrosRef = ref(database, 'Steven_Arequipa');
             onValue(registrosRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
