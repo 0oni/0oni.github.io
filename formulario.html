@@ -46,10 +46,11 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-right: 5px;
         }
 
         button:hover {
-            background-color: #2b99bb;
+            background-color: #45a049;
         }
 
         #registros-container {
@@ -69,7 +70,7 @@
             align-items: center;
         }
 
-        .eliminar-btn {
+        .eliminar-btn, .editar-btn {
             background-color: #e74c3c;
             color: #fff;
             padding: 5px 10px;
@@ -79,6 +80,10 @@
         }
 
         .eliminar-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .editar-btn:hover {
             background-color: #c0392b;
         }
     </style>
@@ -152,19 +157,25 @@
                 }
             ).catch(error => console.error("Error al crear registro:", error));
             document.getElementById("crud-form").reset();
+            mostrarRegistros(); // Añadido: Actualiza la lista después de crear
         } else {
             alert("Por favor, complete todos los campos.");
         }
     };
 
-    // Función para agregar el botón de eliminar
-    function agregarBotonEliminar(key) {
+    // Función para agregar botones de eliminar y editar
+    function agregarBotones(key) {
         const btnEliminar = document.createElement("button");
         btnEliminar.textContent = "Eliminar";
         btnEliminar.className = "eliminar-btn";
         btnEliminar.addEventListener("click", () => eliminarRegistro(key));
 
-        return btnEliminar;
+        const btnEditar = document.createElement("button");
+        btnEditar.textContent = "Editar";
+        btnEditar.className = "editar-btn";
+        btnEditar.addEventListener("click", () => editarRegistro(key));
+
+        return [btnEliminar, btnEditar];
     }
 
     // Función para eliminar un registro
@@ -184,6 +195,12 @@
         });
     }
 
+    // Función para editar un registro
+    function editarRegistro(key) {
+        console.log("Clave del registro a editar:", key);
+        // Aquí puedes implementar la lógica para editar el registro
+    }
+
     // Función para mostrar registros
     function mostrarRegistros() {
         const registrosList = document.getElementById("registros-list");
@@ -196,7 +213,9 @@
                 Object.entries(data).forEach(([key, registro]) => {
                     const listItem = document.createElement("li");
                     listItem.innerHTML = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
-                    listItem.appendChild(agregarBotonEliminar(key));
+                    const [btnEliminar, btnEditar] = agregarBotones(key);
+                    listItem.appendChild(btnEliminar);
+                    listItem.appendChild(btnEditar);
                     registrosList.appendChild(listItem);
                 });
             }
@@ -205,7 +224,7 @@
         });
     }
 
-    // Event listeners
+    // Agrega el evento submit al formulario
     document.getElementById("crud-form").addEventListener("submit", crearRegistro);
 
     // Al cargar la página, muestra los registros
