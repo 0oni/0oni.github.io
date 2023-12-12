@@ -59,15 +59,20 @@
         }
 
         #registros-list {
-            list-style-type: none;
+            margin: 0;
             padding: 0;
         }
 
-        #registros-list li {
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        #registros-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        #registros-list th, #registros-list td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
         }
 
         .eliminar-btn, .editar-btn {
@@ -206,21 +211,9 @@
 
         // Función para mostrar la tabla de edición
         function mostrarTablaEdicion(key) {
-            // Oculta todas las tablas de edición antes de mostrar una nueva
-            document.querySelectorAll(".tabla-edicion").forEach(tabla => {
-                tabla.style.display = "none";
-            });
-
             const tablaEdicion = document.getElementById(`tabla-edicion-${key}`);
             if (tablaEdicion) {
                 tablaEdicion.style.display = "table";
-
-                // Agrega el manejador de eventos para los botones "Guardar" y "Cancelar"
-                const btnGuardar = tablaEdicion.querySelector(".btn-guardar");
-                const btnCancelar = tablaEdicion.querySelector(".btn-cancelar");
-
-                btnGuardar.addEventListener("click", () => actualizarRegistro(key));
-                btnCancelar.addEventListener("click", () => ocultarTablaEdicion(key));
             }
         }
 
@@ -270,12 +263,33 @@
             onValue(registrosRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
+                    const table = document.createElement("table");
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Email</th>
+                                <th>Edad</th>
+                                <th>Cédula</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+
                     Object.entries(data).forEach(([key, registro]) => {
-                        const listItem = document.createElement("li");
-                        listItem.innerHTML = `Nombre: ${registro.name}, Apellido: ${registro.last_name}, Email: ${registro.email}, Edad: ${registro.age}, Cédula: ${registro.card}`;
                         const [btnEliminar, btnEditar] = agregarBotones(key);
-                        listItem.appendChild(btnEliminar);
-                        listItem.appendChild(btnEditar);
+                        table.innerHTML += `
+                            <tr>
+                                <td>${registro.name}</td>
+                                <td>${registro.last_name}</td>
+                                <td>${registro.email}</td>
+                                <td>${registro.age}</td>
+                                <td>${registro.card}</td>
+                                <td>${btnEliminar.outerHTML} ${btnEditar.outerHTML}</td>
+                            </tr>
+                        `;
 
                         // Agrega la tabla de edición debajo del registro
                         const tablaEdicion = document.createElement("table");
@@ -293,10 +307,22 @@
                             </tr>
                         `;
 
-                        listItem.appendChild(tablaEdicion);
+                        // Añade eventos a los botones de la tabla de edición
+                        const btnGuardar = tablaEdicion.querySelector(".btn-guardar");
+                        const btnCancelar = tablaEdicion.querySelector(".btn-cancelar");
 
-                        registrosList.appendChild(listItem);
+                        btnGuardar.addEventListener("click", () => actualizarRegistro(key));
+                        btnCancelar.addEventListener("click", () => ocultarTablaEdicion(key));
+
+                        table.innerHTML += `
+                            <tr>
+                                <td colspan="6">${tablaEdicion.outerHTML}</td>
+                            </tr>
+                        `;
                     });
+
+                    table.innerHTML += `</tbody></table>`;
+                    registrosList.appendChild(table);
                 }
             }, (error) => {
                 console.error("Error al obtener registros:", error);
