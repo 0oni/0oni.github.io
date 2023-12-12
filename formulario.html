@@ -170,15 +170,14 @@ event.preventDefault();
         }
 
         function eliminarRegistro(key) {
-    console.log("Intentando eliminar registro con clave:", key);
+    console.log("Clave del registro a eliminar:", key);
+    if (!key) {
+        console.error("La clave es nula o indefinida.");
+        return;
+    }
+
     const registroRef = ref(database, `formulario01/${key}`);
-    remove(registroRef)
-        .then(() => {
-            console.log("Registro eliminado correctamente.");
-        })
-        .catch((error) => {
-            console.error("Error al eliminar registro:", error);
-        });
+    // Resto del código...
 }
 
         function mostrarRegistros() {
